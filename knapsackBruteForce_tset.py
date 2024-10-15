@@ -11,6 +11,7 @@ def time_knapsack(type: str, total: int, coins: list[int]) -> tuple[bool, float]
 
     print(f"Solving knapsack for Type: {type}, Total: {total}, Coins: {coins}")
 
+    # Bruteforce method: attempt every possible combination 
     for r in range(1, total + 1):
         for combination in itertools.combinations_with_replacement(coins, r):
             if sum(combination) == total:
@@ -35,6 +36,11 @@ def main():
 
     args = parser.parse_args()
 
+    # If something went wrong and the file cannot be opened, exit with error
+    if (not args.file):
+        print("Error opening file.")
+        return
+
     # Lists to store data for plotting
     total_values_success   = []
     total_values_failure   = []
@@ -48,8 +54,8 @@ def main():
             # Process the regular test cases
             with args.test_file as file:
                 for line in file:
-                    line = line.strip().split(',')
-                    result = time_knapsack(line[0], int(line[1]), [int(x) for x in line[2:]])
+                    line         = line.strip().split(',')
+                    result       = time_knapsack(line[0], int(line[1]), [int(x) for x in line[2:]])
                     elapsed_time = result[1]
                     print(f"Time taken for test case: {elapsed_time:.6f}\n")
 
@@ -60,13 +66,12 @@ def main():
                     else:
                         total_values_failure.append(int(line[1]))
                         elapsed_times_failures.append(elapsed_time)
-                    
 
             # Process the guaranteed fails
             with args.fail_file as file:
                 for line in file:
-                    line = line.strip().split(',')
-                    result = time_knapsack(line[0], int(line[1]), [int(x) for x in line[2:]])
+                    line         = line.strip().split(',')
+                    result       = time_knapsack(line[0], int(line[1]), [int(x) for x in line[2:]])
                     elapsed_time = result[1]
                     print(f"Time taken for guaranteed fail case: {elapsed_time:.6f}\n")
 
@@ -77,7 +82,7 @@ def main():
             # Plot the results
             plt.figure(figsize=(10, 6))
             
-        # Plot successes in green
+            # Plot successes in green
             plt.plot(sorted(total_values_success), sorted(elapsed_times_success), marker='o', linestyle='-', color='g', label='Successes')
             
             # Plot failures in red (both from test cases and guaranteed fails)
@@ -89,6 +94,8 @@ def main():
             plt.grid()
             plt.legend()
             plt.show()
+
+    args.file.close()
 
     return 0
 
